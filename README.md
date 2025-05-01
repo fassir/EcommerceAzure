@@ -11,65 +11,65 @@ Neste projeto é criado um e-commerce com site e associado a um banco de dados b
 Os arquivos serão disponibilizados para melhor compreensão dos procedimentos realizados, mas seus conteúdos também são mostrados de acordo com a necessidade de uso.
 ## Criando um Resource Group e SQL Database
 Conecte ao portal Azure e pesquise por "grupo de recursos"
-![alt text](image.png)
+![alt text](imagens/image.png)
 Selecione a opção "Criar"
-![alt text](image-1.png)
+![alt text](imagens/image-1.png)
 Escreva o nome do grupo de recursos e selecione "revisar e criar" e após isto a opção criar.
-![alt text](image-2.png)
+![alt text](imagens/image-2.png)
 Na lista de grupo de recursos, selecione o grupo recém criado
-![alt text](image-4.png)
+![alt text](imagens/image-4.png)
 e após isto selecione a opção "criar"
-![alt text](image-3.png)
+![alt text](imagens/image-3.png)
 Pesquise por sql e selecione o "Azure SQL"
-![alt text](image-5.png)
+![alt text](imagens/image-5.png)
 Aperte a opção "criar"
-![alt text](image-6.png)
+![alt text](imagens/image-6.png)
 e escolha o plano Banco de dados individual
-![alt text](image-7.png)
+![alt text](imagens/image-7.png)
 Selecione o grupo de recurso, digite um nome de database conforme as regras e após isto, selecione a opção "criar novo" para criar um novo servidor
-![alt text](image-8.png)
+![alt text](imagens/image-8.png)
 Ao criar um servidor de banco de dados, digite o nome do servidor, a localização disponível para a criação em sua conta, selecione o método de autentificação "usar autentificação SQL e Microsoft Entra, defina o administrador com sua conta azure, digite o usuário e senha de acordo com os requisitos de segurança e aperte ok
-![alt text](image-9.png)
+![alt text](imagens/image-9.png)
 É possível alterar o banco de dados para a opção serverless, diminuindo os custo da aplicação. Para isto selecione "configurar banco de dados"
-![alt text](image-10.png)
+![alt text](imagens/image-10.png)
 e selecione a opção "sem servidor". Nesta mesma janela habilite o atraso de pausa automático e configure para uma hora afim de reduzir os custos desnecessários do serviço executando em tempos ociosos. Clique em aplicar
-![alt text](image-11.png)
+![alt text](imagens/image-11.png)
 Após isto, clique em "revisar + criar". Após isto selecione a opção criar.
 
 ## Criando uma conta de armazenamento
 Volte ao menu inicial e crie um novo recurso. Selecione a opção conta de armazenamento. Caso não esteja aparecendo, utilize a pesquisa
-![alt text](image-12.png)
+![alt text](imagens/image-12.png)
 Digite o nome de usuário da conta de armazenamento e Selecione o grupo de recursos, digite o nome da conta de armazenamento, selecione a região disponível para conta, selecione o armazenamento de blobs do azure ou azure data lake storage gen 2 e selecione a redundancia local e clique examinar + criar
-![alt text](image-13.png)
+![alt text](imagens/image-13.png)
 Selecione as opções avançadas e marque a opção "Permitir a habilitação de acesso anônimo em contêineres individuais" e selecione "examinar + criar"
-![alt text](image-14.png)
+![alt text](imagens/image-14.png)
 Após o serviço validar as opções, clique em criar. Precisamos criar agora um container que nos habilite a acessar o banco de dados.
 
 Acesse a conta de armazenamento e navegue pelo menu a esquerda nas opções "armazenamento de dados" > "contêineres"
- ![alt text](image-15.png)
+ ![alt text](imagens/image-15.png)
  Selecione a opção "criar", digite o nome do contêiner, selecione a opção "Blob (acesso de leitura anônimosomente para blobs)" e aperte criar na opção inferior
- ![alt text](image-16.png)
+ ![alt text](imagens/image-16.png)
 è necessário agora localizar a chave de acesso deste novo contêiner. Para isso, no menu à esquerda selecione a opção "Segurança + rede" > "Chaves de acesso" 
-![alt text](image-17.png)
+![alt text](imagens/image-17.png)
 Selecione "mostrar" na cadeia de conexão, copie e cole em um documento novo para criar o acesso ao banco de dados do contêiner.
 
 ## Configurando o banco de dados e criando a tabela de produtos
 Após criar o contêiner podemos configurá-lo para inserir o banco de dados acessá-lo. Selecione a opção "visão geral" e selecione acesse o grupo de recursos
-![alt text](image-18.png)
+![alt text](imagens/image-18.png)
 Na tabela de recursos, acesse o Banco de dados SQL
-![alt text](image-19.png)
+![alt text](imagens/image-19.png)
 Vá na opção "Configurações" > Cadeias de conexão e copie para o arquivo o servidor de acesso ao banco de dados (caso seja a porta padrão do banco de dados - 1433 - não é necessário copiá-la no arquivo). Após isto, copie o database localizado no segmento "Catalog"
-![alt text](image-20.png)
+![alt text](imagens/image-20.png)
 Precisamos agora configurar as configurações de rede para liberar o acesso do firewall do conteiner para nosso acesso. No menu lateral selecione a opção "Segurança" > "Rede". Em seguida, selecione a opção "Acesso privado" e depois selecione a opção "Adicionar o endereço IPv4 do cliente e salve as novas configurações.
-![alt text](image-21.png)
+![alt text](imagens/image-21.png)
 Vamos verificar a conexão com o banco de dados usando o azure data studio. Selecione a opção "new" > new connection"
-![alt text](image-22.png)
+![alt text](imagens/image-22.png)
 Insira seus dados e conecte-se ao banco de dados
-![alt text](image-23.png)
+![alt text](imagens/image-23.png)
 * Caso não tenha conectado verifique se o serviço de banco de dados está online e se as regras de firewall do passo anterior está correta.
 
 Uma vez conectado, aperte com o batão direito no banco de dados e em seguida em "new query"
-![alt text](image-24.png)
+![alt text](imagens/image-24.png)
 Crie a tabela Produtos com o seguinte comando 
 ```
 CREATE TABLE dbo.Produtos (
@@ -147,7 +147,7 @@ e após isto execute o arquivo com o comando
 python main.py
 ```
 Abrirá uma página em seu navegador padrão da seguinte forma:
-![alt text](image-25.png)
+![alt text](imagens/image-25.png)
 
 Mais adiante será incorporado ao código a parte em que o programa exportará os dados ao banco de dados.
 ## Implementando o salvamento de imagens no Blob Storage
