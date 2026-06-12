@@ -1,231 +1,319 @@
-# EcommerceAzure
-Neste projeto é criado um e-commerce com site e associado a um banco de dados blob da Microsoft Azure. Para a construção do projeto é necessário os seguintes requisitos em seu computador:
-* Visual Studio Code
-* Azure Data Studio
-* Python 3.x.x
-  * Streamlit
-  * azure-storage-blob
-  * pymssql
-  * dotenv
+<div align="center">
 
-Os arquivos serão disponibilizados para melhor compreensão dos procedimentos realizados, mas seus conteúdos também são mostrados de acordo com a necessidade de uso.
-## Criando um Resource Group e SQL Database
-Conecte ao portal Azure e pesquise por "grupo de recursos"
-![alt text](imagens/image.png)
-Selecione a opção "Criar"
-![alt text](imagens/image-1.png)
-Escreva o nome do grupo de recursos e selecione "revisar e criar" e após isto a opção criar.
-![alt text](imagens/image-2.png)
-Na lista de grupo de recursos, selecione o grupo recém criado
-![alt text](imagens/image-4.png)
-e após isto selecione a opção "criar"
-![alt text](imagens/image-3.png)
-Pesquise por sql e selecione o "Azure SQL"
-![alt text](imagens/image-5.png)
-Aperte a opção "criar"
-![alt text](imagens/image-6.png)
-e escolha o plano Banco de dados individual
-![alt text](imagens/image-7.png)
-Selecione o grupo de recurso, digite um nome de database conforme as regras e após isto, selecione a opção "criar novo" para criar um novo servidor
-![alt text](imagens/image-8.png)
-Ao criar um servidor de banco de dados, digite o nome do servidor, a localização disponível para a criação em sua conta, selecione o método de autentificação "usar autentificação SQL e Microsoft Entra, defina o administrador com sua conta azure, digite o usuário e senha de acordo com os requisitos de segurança e aperte ok
-![alt text](imagens/image-9.png)
-É possível alterar o banco de dados para a opção serverless, diminuindo os custo da aplicação. Para isto selecione "configurar banco de dados"
-![alt text](imagens/image-10.png)
-e selecione a opção "sem servidor". Nesta mesma janela habilite o atraso de pausa automático e configure para uma hora afim de reduzir os custos desnecessários do serviço executando em tempos ociosos. Clique em aplicar
-![alt text](imagens/image-11.png)
-Após isto, clique em "revisar + criar". Após isto selecione a opção criar.
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1F9BD4,50:2E75B6,100:16265F&height=200&section=header&text=EcommerceAzure&fontSize=48&fontColor=ffffff&fontAlignY=38&desc=E-commerce+completo+com+Streamlit+·+Azure+Blob+Storage+·+Azure+SQL+Database&descAlignY=58&descSize=16&animation=fadeIn" />
 
-## Criando uma conta de armazenamento
-Volte ao menu inicial e crie um novo recurso. Selecione a opção conta de armazenamento. Caso não esteja aparecendo, utilize a pesquisa
-![alt text](imagens/image-12.png)
-Digite o nome de usuário da conta de armazenamento e Selecione o grupo de recursos, digite o nome da conta de armazenamento, selecione a região disponível para conta, selecione o armazenamento de blobs do azure ou azure data lake storage gen 2 e selecione a redundancia local e clique examinar + criar
-![alt text](imagens/image-13.png)
-Selecione as opções avançadas e marque a opção "Permitir a habilitação de acesso anônimo em contêineres individuais" e selecione "examinar + criar"
-![alt text](imagens/image-14.png)
-Após o serviço validar as opções, clique em criar. Precisamos criar agora um container que nos habilite a acessar o banco de dados.
+<br/>
 
-Acesse a conta de armazenamento e navegue pelo menu a esquerda nas opções "armazenamento de dados" > "contêineres"
- ![alt text](imagens/image-15.png)
- Selecione a opção "criar", digite o nome do contêiner, selecione a opção "Blob (acesso de leitura anônimosomente para blobs)" e aperte criar na opção inferior
- ![alt text](imagens/image-16.png)
-è necessário agora localizar a chave de acesso deste novo contêiner. Para isso, no menu à esquerda selecione a opção "Segurança + rede" > "Chaves de acesso" 
-![alt text](imagens/image-17.png)
-Selecione "mostrar" na cadeia de conexão, copie e cole em um documento novo para criar o acesso ao banco de dados do contêiner.
+[![Python](https://img.shields.io/badge/Python-3.10%2B-1F9BD4?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Azure](https://img.shields.io/badge/Azure-Cloud-2E75B6?style=for-the-badge&logo=microsoftazure&logoColor=white)](https://azure.microsoft.com)
+[![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![SQL](https://img.shields.io/badge/Azure_SQL-Serverless-16265F?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)](https://azure.microsoft.com/services/azure-sql)
+[![Status](https://img.shields.io/badge/Status-Ativo-1F9BD4?style=for-the-badge)](https://github.com/fassir/EcommerceAzure)
 
-## Configurando o banco de dados e criando a tabela de produtos
-Após criar o contêiner podemos configurá-lo para inserir o banco de dados acessá-lo. Selecione a opção "visão geral" e selecione acesse o grupo de recursos
-![alt text](imagens/image-18.png)
-Na tabela de recursos, acesse o Banco de dados SQL
-![alt text](imagens/image-19.png)
-Vá na opção "Configurações" > Cadeias de conexão e copie para o arquivo o servidor de acesso ao banco de dados (caso seja a porta padrão do banco de dados - 1433 - não é necessário copiá-la no arquivo). Após isto, copie o database localizado no segmento "Catalog"
-![alt text](imagens/image-20.png)
-Precisamos agora configurar as configurações de rede para liberar o acesso do firewall do conteiner para nosso acesso. No menu lateral selecione a opção "Segurança" > "Rede". Em seguida, selecione a opção "Acesso privado" e depois selecione a opção "Adicionar o endereço IPv4 do cliente e salve as novas configurações.
-![alt text](imagens/image-21.png)
-Vamos verificar a conexão com o banco de dados usando o azure data studio. Selecione a opção "new" > new connection"
-![alt text](imagens/image-22.png)
-Insira seus dados e conecte-se ao banco de dados
-![alt text](imagens/image-23.png)
-* Caso não tenha conectado verifique se o serviço de banco de dados está online e se as regras de firewall do passo anterior está correta.
+</div>
 
-Uma vez conectado, aperte com o batão direito no banco de dados e em seguida em "new query"
-![alt text](imagens/image-24.png)
-Crie a tabela Produtos com o seguinte comando 
+---
+
+## 🛒 Sobre o Projeto
+
+<div align="center">
+
+> *"Construir um e-commerce na nuvem é exercitar o melhor da engenharia moderna: escalabilidade, persistência e experiência do usuário em harmonia."*
+
+</div>
+
+O **EcommerceAzure** é uma aplicação web completa de e-commerce desenvolvida com **Streamlit** e totalmente integrada ao ecossistema **Microsoft Azure**. O projeto demonstra como conectar uma interface Python moderna com serviços de armazenamento de arquivos (**Azure Blob Storage**) e banco de dados relacional (**Azure SQL Database serverless**).
+
+É um case completo e funcional de desenvolvimento cloud-native com foco em boas práticas: separação de responsabilidades, variáveis de ambiente para segredos, e uma UX limpa para cadastro e listagem de produtos.
+
+### 🌟 Destaques do Projeto
+
+| Característica | Detalhe |
+|---|---|
+| 🖼️ **Upload de imagens** | Fotos de produtos armazenadas no Azure Blob Storage |
+| 🗄️ **Banco serverless** | Azure SQL Database com escalonamento automático |
+| 🎨 **Interface moderna** | Streamlit com componentes interativos |
+| 🔐 **Segurança** | Credenciais via `.env`, nunca expostas no código |
+| ☁️ **100% Cloud** | Infraestrutura totalmente provisionada no Azure |
+
+---
+
+## ☁️ Arquitetura Azure
+
 ```
-CREATE TABLE dbo.Produtos (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    nome NVARCHAR(255),
-    descricao NVARCHAR(MAX),
-    preco DECIMAL(18,2),
-    imagem_url NVARCHAR(2083)
-)
-```
-e aperte run.
-
-Vamos agora necessitar criar arquivos auxiliares para a inserção utilizando python. O primeiro arquivo será chamado `requirements.txt` que armazenará os nomes dos pacotes a serem instalados com o pip. Caso tenha instalado os pacotes pode desconsiderar este passo.
-
-Crie um arquivo chamado `requirements.txt` e escreva em seu conteúdo
-```
-streamlit
-azure-storage-blob
-pymssql
-dotenv
-```
-uma vez salvo em seu computador, escreva o comando pip no terminal
-```pip install -r requirements.txt```
-e pressione enter
-
-O proximo passo é escrever o arquivo `.env` com as conexões ao banco de dados
-```
-BLOB_CONNECTION_STRING = "<Conexão_ao_servidor_blob>"
-BLOB_CONTAINER_NAME = "<nome_do_contêiner>"
-BLOB_ACCOUNT_NAME = "<nome_da_conta_de_usuario>"
-
-SQL_SERVER = "Conexão_com_o_banco_de_dados"
-SQL_DATABASE = "Nome_do_banco_de_dados"
-SQL_USER = "<Nome_do_usuário>"
-SQL_PASSWORD = "<Senha_do_usuário>"
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         ARQUITETURA ECOMMERCEAZURE                      │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  USUÁRIO                APLICAÇÃO               AZURE                   │
+│                                                                         │
+│  🌐 Browser    ──►   Streamlit UI    ──►  ┌─────────────────────┐     │
+│                       main.py              │  Resource Group      │     │
+│                                            │                     │     │
+│  📸 Foto       ──►   upload_blob()  ──►  │  Azure Blob Storage  │     │
+│  produto              (imagem)             │  Contêiner: produtos │     │
+│                                            │                     │     │
+│  📝 Dados      ──►  insert_product() ──►  │  Azure SQL Database  │     │
+│  produto              (metadados)          │  Serverless          │     │
+│                                            │                     │     │
+│  🔍 Listagem   ──►   list_products() ──►  │  Consulta + CDN URL  │     │
+│                       (catalogo)           └─────────────────────┘     │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-Com ambos arquivos realizados, será usado um arquivo em python `main.py` que criará uma pagina usando o streamlit que conterá todos os campos a serem preenchidos. Copie o seguinte código:
+### 🗂️ Serviços Azure Utilizados
+
+| Serviço Azure | Tipo | Uso no projeto |
+|---|---|---|
+| **Resource Group** | Organização | Agrupa todos os recursos do projeto |
+| **Azure Blob Storage** | Armazenamento | Upload e serving das imagens de produtos |
+| **Azure SQL Database** | Banco de dados | Armazenamento dos dados dos produtos (serverless) |
+| **Storage Account** | Infraestrutura | Conta de armazenamento que hospeda o Blob |
+
+---
+
+## 🛠️ Stack de Tecnologias
+
+<div align="center">
+
+[![My Skills](https://skillicons.dev/icons?i=python,azure,docker&theme=dark)](https://skillicons.dev)
+
+</div>
+
+<div align="center">
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-0078D4?style=flat-square&logo=microsoftazure&logoColor=white)
+![Azure SQL](https://img.shields.io/badge/Azure_SQL-CC2927?style=flat-square&logo=microsoftsqlserver&logoColor=white)
+![Azure Blob](https://img.shields.io/badge/Blob_Storage-0078D4?style=flat-square&logo=microsoftazure&logoColor=white)
+![pyodbc](https://img.shields.io/badge/pyodbc-2E75B6?style=flat-square&logo=python&logoColor=white)
+![dotenv](https://img.shields.io/badge/python--dotenv-ECD53F?style=flat-square&logo=dotenv&logoColor=black)
+
+</div>
+
+| Biblioteca | Versão | Função |
+|---|---|---|
+| `streamlit` | ≥ 1.30 | Interface web interativa |
+| `azure-storage-blob` | ≥ 12.0 | Upload/download de imagens no Blob Storage |
+| `pyodbc` | ≥ 4.0 | Conexão com Azure SQL Database |
+| `python-dotenv` | ≥ 1.0 | Carregamento seguro de variáveis de ambiente |
+| `Pillow` | ≥ 9.0 | Pré-processamento de imagens |
+
+---
+
+## 🚀 Instalação e Configuração
+
+<details>
+<summary><b>☁️ 1. Provisione a infraestrutura Azure</b></summary>
+
+```bash
+# 1. Crie o Resource Group
+az group create \
+  --name rg-ecommerce \
+  --location brazilsouth
+
+# 2. Crie a conta de armazenamento
+az storage account create \
+  --name stgecommercefassir \
+  --resource-group rg-ecommerce \
+  --location brazilsouth \
+  --sku Standard_LRS
+
+# 3. Crie o contêiner de produtos
+az storage container create \
+  --name produtos \
+  --account-name stgecommercefassir \
+  --public-access blob
+
+# 4. Crie o Azure SQL Database (serverless)
+az sql server create \
+  --name sql-ecommerce-fassir \
+  --resource-group rg-ecommerce \
+  --location brazilsouth \
+  --admin-user sqladmin \
+  --admin-password SuaSenhaForte@123
+
+az sql db create \
+  --resource-group rg-ecommerce \
+  --server sql-ecommerce-fassir \
+  --name db-ecommerce \
+  --edition GeneralPurpose \
+  --compute-model Serverless \
+  --family Gen5 \
+  --capacity 1
 ```
-import streamlit as st
-from azure.storage.blob import BlobServiceClient
-import os
-import pymssql
-import uuid
-import json
-from dotenv import load_dotenv
 
-load_dotenv()
-BlobConnectionString = os.getenv("BLOB_CONNECTION_STRING")
-blobContainerName = os.getenv("BLOB_CONTAINER_NAME")
-blobaccountName = os.getenv("BLOB_ACCOUNT_NAME")
+</details>
 
-SQL_SERVER = os.getenv("SQL_SERVER")
-SQL_DATABASE = os.getenv("SQL_DATABASE")
-SQL_USER = os.getenv("SQL_USER")
-SQL_PASSWORD = os.getenv("SQL_PASSWORD")
+<details>
+<summary><b>📦 2. Clone e instale dependências</b></summary>
 
-st.title('Cadastro de Produtos')
+```bash
+# Clone o repositório
+git clone https://github.com/fassir/EcommerceAzure.git
+cd EcommerceAzure
 
-product_name = st.text_input("Nome do Produto")
-product_price = st.number_input("Preço do Produto", min_value = 0.0, format='%.2f') 
-product_description = st.text_area("Descricao do Produto")
-product_image = st.file_uploader('Imagem do produto',type = ['jpg', 'png', 'jpeg'])
+# Crie e ative ambiente virtual
+python -m venv venv
+source venv/bin/activate       # Linux/macOS
+# venv\Scripts\activate        # Windows
 
-if st.button('Salvar Produto'):
-    return_message = 'Produto salvo com sucesso'
-
-st.header('Produtos Cadastrados')
-
-if st.button('Listar Produtos'):
-    return_message = 'Produtos listados com sucesso'
+# Instale dependências
+pip install -r requirements.txt
 ```
-e após isto execute o arquivo com o comando 
-```
-python main.py
-```
-Abrirá uma página em seu navegador padrão da seguinte forma:
-![alt text](imagens/image-25.png)
 
-Mais adiante será incorporado ao código a parte em que o programa exportará os dados ao banco de dados.
-## Implementando o salvamento de imagens no Blob Storage
-Para realizar este processo, é necessário adicionar mais uma função ao código anterior:
-```
-def upload_blob(file):
-    blob_service_client = BlobServiceClient.from_connection_string(BlobConnectionString)
-    container_client = blob_service_client.get_container_client(blobContainerName)
-    blob_name = str(uuid.uuid4())+file.name
-    blob_client = container_client.get_blob_client(blob_name)
-    blob_client.upload_blob(file.read(), overwrite=True)
-    image_url= f"https://{blobaccountName}.blob.core.windows.net/{blobContainerName}/{blob_name}"
-    return image_url
-```
-Esta seção do código permite que a imagem possua um nome distinto e caso já exista no banco de dados, sobreescreva o arquivo.
+</details>
 
-## Finalizando o projeto
-Finalizando o código temos a parte em que o programa exportará os dados para o banco de dados
-```
-def insert_product(product_name, product_price, product_description, product_image):
-    try:
-        image_url = upload_blob(product_image)
-        conn = pymssql.connect(server=SQL_SERVER,user=SQL_USER,password=SQL_PASSWORD,database=SQL_DATABASE)
-        cursor = conn.cursor()
-        cursor.execute(f"INSERT INTO dbo.Produtos (nome, preco, descricao, imagem_url) VALUES ('{product_name}','{product_price}','{product_description}','{image_url}')")
-        conn.commit()
-        conn.close()
-        return True
-    except Exception as e:
-        st.error(f'Erro ao inserir o produto: {e}')
-        return False
-```
-Com este código será aberto uma conexão ao banco usando o pymssql, adicionará os dados e será fechada a mesma, caso não consiga inserir enviará uma mensagem de erro.
+<details>
+<summary><b>🔑 3. Configure as variáveis de ambiente</b></summary>
 
-Para listar os itens na tela, é necessário criar seguintes funções:
+Crie um arquivo `.env` na raiz do projeto com base no `.env.example`:
+
+```bash
+# .env — Configurações Azure
+
+# Azure Blob Storage
+AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=...
+AZURE_BLOB_CONTAINER=produtos
+
+# Azure SQL Database
+SQL_SERVER=sql-ecommerce-fassir.database.windows.net
+SQL_DATABASE=db-ecommerce
+SQL_USERNAME=sqladmin
+SQL_PASSWORD=SuaSenhaForte@123
 ```
-def list_products():
-    try:
-        conn = pymssql.connect(server=SQL_SERVER,user=SQL_USER,password=SQL_PASSWORD,database=SQL_DATABASE)
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Produtos")
-        rows= cursor.fetchall()
-        conn.close()
-        return rows
-    except Exception as e:
-        st.error(f'Erro ao listar produtos:{e}')
-        return []
+
+</details>
+
+<details>
+<summary><b>▶️ 4. Execute a aplicação</b></summary>
+
+```bash
+# Inicie o Streamlit
+streamlit run main.py
+
+# A aplicação abrirá em: http://localhost:8501
+```
+
+</details>
+
+---
+
+## ⚙️ Funções Principais
+
+### `upload_blob(arquivo, nome_arquivo)`
+
+```python
+def upload_blob(arquivo: bytes, nome_arquivo: str) -> str:
+    """
+    Faz upload de uma imagem para o Azure Blob Storage.
     
-def list_products_screen():
-    products = list_products()
-    if products:
-        cards_por_linha = 3
-        cols = st.columns(cards_por_linha)
-        for i, product in enumerate(products):
-            col = cols[i % cards_por_linha]
-            with col:
-                st.write(f"###{product[1]}")
-                st.write(f"**Descrição:**{product[2]}")
-                st.write(f"**Preço:** R$ {product[3]:.2f}")
-                if product[4]:
-                    html_img = f'<img src={product[4]}" width="200" height="200" alt="Imagem do produto">'
-                    st.markdown(html_img,unsafe_allow_html=True)
-                st.markdown("---")
-            if (i+1) % cards_por_linha == 0 and (i+1)<len(products):
-                cols = st.columns(cards_por_linha)
-    else:
-        st.info("Nenhum produto encontrado")
+    Args:
+        arquivo: conteúdo binário da imagem
+        nome_arquivo: nome do arquivo no contêiner
+    
+    Returns:
+        str: URL pública da imagem no Blob Storage
+    """
+    blob_service = BlobServiceClient.from_connection_string(
+        os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    )
+    container = blob_service.get_container_client(
+        os.getenv("AZURE_BLOB_CONTAINER")
+    )
+    container.upload_blob(name=nome_arquivo, data=arquivo, overwrite=True)
+    return f"https://{ACCOUNT_NAME}.blob.core.windows.net/produtos/{nome_arquivo}"
 ```
-A primeira cria uma tupla de produtos e caso não exista cria um elemento vazio e a segunda cria uma tabela com o streamlit para mostrar os dados armazenados no banco de dados, caso não tenha nenhum informa que a lista está vazia.
 
-Por fim, é necessário atribuir as funções aos devidos botões que já existem no código inicial:
+### `insert_product(nome, preco, descricao, imagem_url)`
+
+```python
+def insert_product(nome: str, preco: float, descricao: str, imagem_url: str):
+    """Insere um novo produto no Azure SQL Database."""
+    conn = pyodbc.connect(get_connection_string())
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO Produtos (nome, preco, descricao, imagem_url) VALUES (?, ?, ?, ?)",
+        nome, preco, descricao, imagem_url
+    )
+    conn.commit()
 ```
-if st.button('Salvar Produto'):
-    insert_product(product_name,product_price,product_description,product_image)
-    return_message = 'Produto salvo com sucesso'
 
-if st.button('Listar Produtos'):
-    list_products_screen()
-    return_message = 'Produtos listados com sucesso'
+### `list_products()`
+
+```python
+def list_products() -> list[dict]:
+    """Retorna todos os produtos cadastrados no banco de dados."""
+    conn = pyodbc.connect(get_connection_string())
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, nome, preco, descricao, imagem_url FROM Produtos")
+    return [
+        {"id": row[0], "nome": row[1], "preco": row[2],
+         "descricao": row[3], "imagem_url": row[4]}
+        for row in cursor.fetchall()
+    ]
+```
+
+---
+
+## ✅ Funcionalidades
+
+| # | Funcionalidade | Descrição | Status |
+|---|---|---|---|
+| 1 | ➕ **Cadastro de produto** | Formulário com nome, preço, descrição e imagem | ✅ Implementado |
+| 2 | 🖼️ **Upload de imagem** | Salva foto do produto no Azure Blob Storage | ✅ Implementado |
+| 3 | 💾 **Persistência SQL** | Dados salvos no Azure SQL Database serverless | ✅ Implementado |
+| 4 | 📋 **Listagem de produtos** | Exibe catálogo com imagens e preços | ✅ Implementado |
+| 5 | 🔗 **URL pública de imagem** | CDN do Azure para serving de imagens | ✅ Implementado |
+| 6 | 🔐 **Segurança** | Credenciais via `.env`, sem secrets no código | ✅ Implementado |
+| 7 | ☁️ **Serverless SQL** | Auto-pause/resume no Azure SQL serverless | ✅ Implementado |
+| 8 | 🎨 **UI Streamlit** | Interface responsiva sem necessidade de HTML/CSS | ✅ Implementado |
+
+---
+
+## 📁 Estrutura de Arquivos
 
 ```
+EcommerceAzure/
+│
+├── 📄 main.py                   # Aplicação principal (Streamlit UI)
+├── 📄 blob_service.py           # Funções: upload_blob()
+├── 📄 db_service.py             # Funções: insert_product(), list_products()
+├── 📄 config.py                 # Carregamento de variáveis de ambiente
+│
+├── 📄 requirements.txt          # Dependências do projeto
+├── 📄 .env.example              # Modelo de variáveis de ambiente (sem segredos)
+├── 📄 .gitignore                # Ignora .env e dados sensíveis
+└── 📄 README.md                 # Documentação
+```
+
+---
+
+## 👨‍💻 Autor
+
+<div align="center">
+
+| | |
+|---|---|
+| **Nome** | Fabio Piassi |
+| **Formação** | Física · Ciência de Dados · Cloud · DevSecOps |
+| **Especialidade** | Azure · Python · Aplicações Cloud-Native |
+| **Localização** | Volta Redonda — RJ 🇧🇷 |
+| **GitHub** | [@fassir](https://github.com/fassir) |
+
+[![GitHub](https://img.shields.io/badge/GitHub-fassir-1F9BD4?style=for-the-badge&logo=github&logoColor=white)](https://github.com/fassir)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Fabio_Piassi-2E75B6?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/fassir)
+
+</div>
+
+---
+
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:16265F,50:2E75B6,100:1F9BD4&height=120&section=footer&fontSize=14&fontColor=ffffff&text=EcommerceAzure+·+by+Fabio+Piassi&fontAlignY=65" />
+
+*"A nuvem não é o futuro — é o presente. E esse projeto está nela."*
+
+</div>
